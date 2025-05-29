@@ -1,3 +1,107 @@
+# 📘 ASEAN Journey Planner — Unified System Documentation
+
+## 🧩 Project Overview
+
+An AI-powered multi-modal journey planner built for Southeast Asia, designed to simplify commuting by integrating:
+
+* 🔐 Google OAuth login
+* 🧠 Gemini/DeepSeek-based AI chat assistant
+* 🗺️ Real-time, traffic-aware routing via OpenRouteService (ORS)
+* 📅 Calendar event analysis and departure suggestions
+* 🧠 Personalized suggestions via user travel pattern learning
+
+---
+
+## 🎯 Problem Statement
+
+Commuters in SEA cities face:
+
+* 🚦 Unpredictable traffic
+* 🔄 Unreliable transport choices
+* 🔍 Repetitive route planning
+* 🗓️ No calendar-based routing
+
+**ASEAN Journey Planner** solves this using AI + behavioral data.
+
+---
+
+## ✅ How Our AI Solves the Problem
+
+### Example Use Case
+
+User says: “I need to reach SCBD by 9am tomorrow”
+
+* 🧠 AI extracts:
+
+  * `origin`: Inferred from past trips (e.g. Home)
+  * `destination`: “SCBD”
+  * `time`: from context or calendar
+  * `mode`: optimal / preferred
+
+* 🚘 Route fetched from OpenRouteService with traffic, cost, carbon footprint
+
+* 🗓️ Suggests departure time based on patterns (e.g. "leave by 8:12 AM")
+
+---
+
+## 🧪 Testable Use Case
+
+**Test Case**: “User wants to reach Jakarta City Hall by 9 AM tomorrow via public transport.”
+
+### Manual UI Steps:
+
+1. Login with Google
+2. Chat: “I have a meeting at city hall tomorrow at 9am”
+3. Observe route, departure time, AI message
+
+### Backend API Test:
+
+Send to `/ai/chat`:
+
+```json
+{
+  "message": "I have a meeting at city hall tomorrow at 9am",
+  "context": {
+    "currentLocation": "Kuningan",
+    "userPatterns": {...},
+    "recentSearches": []
+  }
+}
+```
+User can chat with AI for current traffic condition, suggestion of best routes, optimal routes and suitable time to leave. 
+
+Also AI suggests a smart Tip to user based on their previous travels.
+
+User can also add via calendar, The app has calendar features in for future updates.
+
+**Expect**: intent = City Hall, departureTime \~8:10am, mode = public, valid route response
+  
+---
+
+## 💸 Monthly Estimated Costs
+
+| Component        | Service           | Plan/Usage Tier       | Monthly Cost (USD) | Notes                                                           |
+| ---------------- | ----------------- | --------------------- | ------------------ | --------------------------------------------------------------- |
+| **Frontend**     | Vercel            | Hobby (Free)          | **\$0**            | 100 GB bandwidth, ideal for React SPA                           |
+| **Backend**      | Render            | Starter Plan          | **\$7**            | 512 MB RAM, 0.1 vCPU, auto deploys from Git                     |
+| **Database**     | Supabase          | Pro Plan              | **\$25**           | 8 GB storage, 100k row writes, auth & REST API included         |
+| **Cache**        | Upstash Redis     | Pay-as-you-go or Free | **\$5**            | Free up to 10K daily reqs, \$0.20/million requests after that   |
+| **Routing API**  | OpenRouteService  | Free Tier (or Paid)   | **\$0–\$49**       | 2,500 req/day free, then \$49 for 100,000 monthly requests      |
+| **AI Chat API**  | Gemini / DeepSeek | Developer Tier        | **\$0–\$20**       | Depends on number of chat requests and token usage              |
+| **Google OAuth** | Google Cloud      | Free Tier             | **\$0**            | Basic usage (OAuth + Calendar API) is free with billing enabled |
+
+### 💰 Total Monthly Estimate:
+
+**➡️ \$37 – \$100 USD**  *(depending on API usage volume)*
+
+---
+
+## 🛠️ Architecture Overview
+
+![ASEAN Journey Planner Architecture](/architechture.png)
+
+---
+
 # Environment Setup Guide
 
 ## Prerequisites
@@ -323,3 +427,12 @@ The application is ready to help commuters across ASEAN cities optimize their da
 - [ ] Cost calculations
 - [ ] Mobile responsive design
 
+
+
+## ✅ Summary
+
+* Users get personalized, smart, and multi-modal journey plans
+* Calendar integration + AI chat makes experience feel intuitive
+* The system is scalable, cache-optimized, and API-driven
+
+Ready for deployment, testing, and impact at scale across SEA cities 🌏
