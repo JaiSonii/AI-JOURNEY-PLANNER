@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
-import { Calendar, Clock, DollarSign, Navigation, MessageSquare, LogIn, Search, Settings, ChevronRight, Loader2, AlertCircle, LogOut } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Navigation, MessageSquare, Search, Settings, ChevronRight, Loader2, AlertCircle, LogOut } from 'lucide-react';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
@@ -8,6 +8,16 @@ import './index.css'
 import MarkDown from 'react-markdown'
 // Fix for default markers in react-leaflet
 import L from 'leaflet';
+
+// Extend the Window interface to include 'google'
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
+
+
+// @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -18,7 +28,8 @@ L.Icon.Default.mergeOptions({
 
 // API Configuration
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+// const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // Axios instance with interceptor
 const api = axios.create({
@@ -38,34 +49,34 @@ api.interceptors.request.use((config) => {
 });
 
 // Google OAuth Script
-const loadGoogleScript = () => {
-  return new Promise((resolve) => {
-    if (window.google) {
-      resolve();
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.onload = resolve;
-    document.body.appendChild(script);
-  });
-};
+// const loadGoogleScript = () => {
+//   return new Promise((resolve) => {
+//     if (window.google) {
+//       resolve();
+//       return;
+//     }
+//     const script = document.createElement('script');
+//     script.src = 'https://accounts.google.com/gsi/client';
+//     script.onload = resolve;
+//     document.body.appendChild(script);
+//   });
+// };
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('planner');
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
-  const [selectedMode, setSelectedMode] = useState('optimal');
+  const [activeTab, setActiveTab] = useState<string>('planner');
+  const [origin, setOrigin] = useState<string>('');
+  const [destination, setDestination] = useState<string>('');
+  const [selectedMode, setSelectedMode] = useState<string>('optimal');
   const [routes, setRoutes] = useState([]);
-  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [selectedRoute, setSelectedRoute] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatMessage, setChatMessage] = useState<string>('');
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [calendarEvents, setCalendarEvents] = useState([]);
-  const [userPatterns, setUserPatterns] = useState(null);
-  const [error, setError] = useState(null);
+  const [userPatterns, setUserPatterns] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
 
   const transportModes = [
@@ -152,8 +163,9 @@ const App = () => {
 
 
 
-  const validateSession = async (token) => {
+  const validateSession = async (token : string) => {
     try {
+      console.log(token)
       const response = await api.get('/auth/validate');
       if (response.data.user) {
         setIsLoggedIn(true);
@@ -166,25 +178,25 @@ const App = () => {
   };
 
   // Handle Google OAuth response
-  const handleGoogleResponse = async (response) => {
-    try {
-      const { data } = await api.post('/auth/google', {
-        token: response.credential,
-      });
+  // const handleGoogleResponse = async (response) => {
+  //   try {
+  //     const { data } = await api.post('/auth/google', {
+  //       token: response.credential,
+  //     });
 
-      localStorage.setItem('authToken', data.token);
-      setIsLoggedIn(true);
-      setUser(data.user);
-      setError(null);
+  //     localStorage.setItem('authToken', data.token);
+  //     setIsLoggedIn(true);
+  //     setUser(data.user);
+  //     setError(null);
 
-      // Fetch user data after login
-      fetchUserPatterns();
-      fetchCalendarEvents();
-    } catch (error) {
-      console.error('Login failed:', error);
-      setError('Login failed. Please try again.');
-    }
-  };
+  //     // Fetch user data after login
+  //     fetchUserPatterns();
+  //     fetchCalendarEvents();
+  //   } catch (error) {
+  //     console.error('Login failed:', error);
+  //     setError('Login failed. Please try again.');
+  //   }
+  // };
 
   // Logout function
   const handleLogout = () => {
@@ -195,7 +207,7 @@ const App = () => {
     setCalendarEvents([]);
 
     // Re-render Google button
-    if (window.google) {
+    if (window.google ) {
       window.google.accounts.id.renderButton(
         document.getElementById('googleSignInButton'),
         { theme: 'outline', size: 'large' }
@@ -270,7 +282,7 @@ const App = () => {
   };
 
   // Handle chat submission
-  const handleChatSubmit = async (e) => {
+  const handleChatSubmit = async (e : any) => {
     e.preventDefault();
     setThinking(true);
 
@@ -328,7 +340,7 @@ const App = () => {
   };
 
   // Plan route from calendar event
-  const planRouteFromEvent = (event) => {
+  const planRouteFromEvent = (event : any) => {
     setDestination(event.location);
     setActiveTab('planner');
 
@@ -516,7 +528,7 @@ const App = () => {
                         <p className="text-sm mt-2">e.g., "I need to reach SCBD by 9 AM tomorrow"</p>
                       </div>
                     ) : (
-                      chatHistory.map((msg, idx) => (
+                      chatHistory.map((msg : any, idx) => (
                         <div
                           key={idx}
                           className={`p-3 rounded-lg ${msg.type === 'user'
@@ -565,7 +577,7 @@ const App = () => {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-semibold mb-4">Route Options</h3>
                 <div className="space-y-3">
-                  {routes.map((route) => (
+                  {routes.map((route : any) => (
                     <button
                       key={route.id}
                       onClick={() => setSelectedRoute(route)}
@@ -673,7 +685,7 @@ const App = () => {
 
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900">Step by Step Directions</h4>
-                  {selectedRoute.steps?.map((step, idx) => (
+                  {selectedRoute.steps?.map((step : any, idx : number) => (
                     <div key={idx} className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
                         {idx + 1}
@@ -715,7 +727,7 @@ const App = () => {
                   Upcoming Trips
                 </h3>
                 <div className="space-y-3">
-                  {calendarEvents.map((event, idx) => (
+                  {calendarEvents.map((event : any, idx) => (
                     <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium">{event.title}</p>
