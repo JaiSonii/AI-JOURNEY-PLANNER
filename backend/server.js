@@ -139,62 +139,61 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 
 // Authentication
-// app.post('/auth/google', async (req, res) => {
-//   try {
-//     const { token } = req.body;
-//     const {tokens} = await client.getToken(token);
-//     const ticket = await client.verifyIdToken({
-//       idToken: token,
-//       audience: GOOGLE_CLIENT_ID,
-//     });
+app.post('/auth/google', async (req, res) => {
+  try {
+    const { token } = req.body;
+    // const {tokens} = await client.getToken(token);
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: GOOGLE_CLIENT_ID,
+    });
 
-//     const payload = ticket.getPayload();
-//     const userId = payload['sub'];
+    const payload = ticket.getPayload();
+    const userId = payload['sub'];
 
-//     // Check if user exists
-//     const { data: existingUser } = await supabase
-//       .from('users')
-//       .select('*')
-//       .eq('oauth_id', userId)
-//       .single();
+    // Check if user exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('oauth_id', userId)
+      .single();
 
-//     let user;
-//     if (!existingUser) {
-//       // Create new user
-//       const { data: newUser, error } = await supabase
-//         .from('users')
-//         .insert([
-//           {
-//             oauth_id: userId,
-//             email: payload.email,
-//             name: payload.name,
-//             oauth_provider: 'google',
-//             google_calendar_token : tokens.access_token,
-//             preferences: {}
-//           }
-//         ])
-//         .select()
-//         .single();
+    let user;
+    if (!existingUser) {
+      // Create new user
+      const { data: newUser, error } = await supabase
+        .from('users')
+        .insert([
+          {
+            oauth_id: userId,
+            email: payload.email,
+            name: payload.name,
+            oauth_provider: 'google',
+            preferences: {}
+          }
+        ])
+        .select()
+        .single();
 
-//       if (error) throw error;
-//       user = newUser;
-//     } else {
-//       user = existingUser;
-//     }
+      if (error) throw error;
+      user = newUser;
+    } else {
+      user = existingUser;
+    }
 
-//     // Generate JWT
-//     const jwtToken = jwt.sign(
-//       { userId: user.id, email: user.email },
-//       JWT_SECRET,
-//       { expiresIn: '7d' }
-//     );
+    // Generate JWT
+    const jwtToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
-//     res.json({ token: jwtToken, user });
-//   } catch (error) {
-//     console.error('Auth error:', error);
-//     res.status(400).json({ error: 'Authentication failed' });
-//   }
-// });
+    res.json({ token: jwtToken, user });
+  } catch (error) {
+    console.error('Auth error:', error);
+    res.status(400).json({ error: 'Authentication failed' });
+  }
+});
 
 // Route Planning
 app.post('/routes/plan', async (req, res) => {
