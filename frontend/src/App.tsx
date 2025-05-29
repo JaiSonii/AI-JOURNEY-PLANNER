@@ -29,7 +29,7 @@ L.Icon.Default.mergeOptions({
 // API Configuration
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-// const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // Axios instance with interceptor
 const api = axios.create({
@@ -49,18 +49,18 @@ api.interceptors.request.use((config) => {
 });
 
 // Google OAuth Script
-// const loadGoogleScript = () => {
-//   return new Promise((resolve) => {
-//     if (window.google) {
-//       resolve();
-//       return;
-//     }
-//     const script = document.createElement('script');
-//     script.src = 'https://accounts.google.com/gsi/client';
-//     script.onload = resolve;
-//     document.body.appendChild(script);
-//   });
-// };
+const loadGoogleScript = () => {
+  return new Promise((resolve : any) => {
+    if (window.google) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.onload = resolve;
+    document.body.appendChild(script);
+  });
+};
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<string>('planner');
@@ -88,78 +88,78 @@ const App = () => {
   ];
 
   // Initialize Google OAuth
-  // useEffect(() => {
-  //   const initGoogleAuth = async () => {
-  //     await loadGoogleScript();
+  useEffect(() => {
+    const initGoogleAuth = async () => {
+      await loadGoogleScript();
 
-  //     if (window.google) {
-  //       window.google.accounts.id.initialize({
-  //         client_id: GOOGLE_CLIENT_ID,
-  //         callback: handleGoogleResponse,
-  //       });
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleResponse,
+        });
 
-  //       window.google.accounts.id.renderButton(
-  //         document.getElementById('googleSignInButton'),
-  //         { 
-  //           theme: 'outline', 
-  //           size: 'large',
-  //           width: 200,
-  //           text: 'signin_with'
-  //         }
-  //       );
-  //     }
-  //   };
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleSignInButton'),
+          { 
+            theme: 'outline', 
+            size: 'large',
+            width: 200,
+            text: 'signin_with'
+          }
+        );
+      }
+    };
 
-  //   // Check for existing session
-  //   const token = localStorage.getItem('authToken');
-  //   if (token) {
-  //     validateSession(token);
-  //   }
+    // Check for existing session
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      validateSession(token);
+    }
 
-  //   initGoogleAuth();
-  // }, []);
+    initGoogleAuth();
+  }, []);
 
   // Validate existing session
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) validateSession(token);
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('authToken');
+  //   if (token) validateSession(token);
+  // }, []);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const authToken = urlParams.get('authToken');
-    if (authToken) {
-      localStorage.setItem('authToken', authToken);
-      validateSession(authToken);
-      window.history.replaceState({}, document.title, window.location.pathname); // Clean URL
-    }
-  }, []);
+  // useEffect(() => {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const authToken = urlParams.get('authToken');
+  //   if (authToken) {
+  //     localStorage.setItem('authToken', authToken);
+  //     validateSession(authToken);
+  //     window.history.replaceState({}, document.title, window.location.pathname); // Clean URL
+  //   }
+  // }, []);
 
 
 
-  const handleGoogleRedirectLogin = () => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = `${API_URL}/auth/google/callback`;
+  // const handleGoogleRedirectLogin = () => {
+  //   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  //   const redirectUri = `${API_URL}/auth/google/callback`;
 
-    const scope = [
-      'https://www.googleapis.com/auth/calendar.readonly',
-      'openid',
-      'email',
-      'profile'
-    ].join(' ');
+  //   const scope = [
+  //     'https://www.googleapis.com/auth/calendar.readonly',
+  //     'openid',
+  //     'email',
+  //     'profile'
+  //   ].join(' ');
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `access_type=offline&` +
-      `prompt=consent&` +
-      `scope=${encodeURIComponent(scope)}`;
+  //   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+  //     `client_id=${clientId}&` +
+  //     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+  //     `response_type=code&` +
+  //     `access_type=offline&` +
+  //     `prompt=consent&` +
+  //     `scope=${encodeURIComponent(scope)}`;
 
-    console.log('Redirecting to:', authUrl);
-    window.location.href = authUrl;
-  };
+  //   console.log('Redirecting to:', authUrl);
+  //   window.location.href = authUrl;
+  // };
 
 
 
@@ -178,25 +178,25 @@ const App = () => {
   };
 
   // Handle Google OAuth response
-  // const handleGoogleResponse = async (response) => {
-  //   try {
-  //     const { data } = await api.post('/auth/google', {
-  //       token: response.credential,
-  //     });
+  const handleGoogleResponse = async (response : any) => {
+    try {
+      const { data } = await api.post('/auth/google', {
+        token: response.credential,
+      });
 
-  //     localStorage.setItem('authToken', data.token);
-  //     setIsLoggedIn(true);
-  //     setUser(data.user);
-  //     setError(null);
+      localStorage.setItem('authToken', data.token);
+      setIsLoggedIn(true);
+      setUser(data.user);
+      setError(null);
 
-  //     // Fetch user data after login
-  //     fetchUserPatterns();
-  //     fetchCalendarEvents();
-  //   } catch (error) {
-  //     console.error('Login failed:', error);
-  //     setError('Login failed. Please try again.');
-  //   }
-  // };
+      // Fetch user data after login
+      fetchUserPatterns();
+      fetchCalendarEvents();
+    } catch (error) {
+      console.error('Login failed:', error);
+      setError('Login failed. Please try again.');
+    }
+  };
 
   // Logout function
   const handleLogout = () => {
@@ -391,12 +391,8 @@ const App = () => {
                   </div>
                 </>
               ) : (
-                <button
-                  onClick={handleGoogleRedirectLogin}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Sign in with Google
-                </button>
+                <div id='googleSignInButton'>
+                  </div>
               )}
             </div>
           </div>
